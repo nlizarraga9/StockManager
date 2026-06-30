@@ -1,4 +1,4 @@
-package com.example.stockmanager.presentation.productos
+package com.example.stockmanager.presentation.productos.lista
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -6,7 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.stockmanager.di.appModule
-import com.example.stockmanager.presentation.productos.ProductoListScreen
+import com.example.stockmanager.presentation.productos.lista.ProductoListScreen
 import org.koin.compose.KoinApplication
 
 @Suppress("ktlint:standard:function-naming")
