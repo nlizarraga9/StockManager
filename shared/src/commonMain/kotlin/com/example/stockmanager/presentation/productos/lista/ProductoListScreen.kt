@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.stockmanager.domain.model.Producto
@@ -41,9 +43,13 @@ fun ProductoListScreen(navController: NavController) {
     val viewModel = koinViewModel<ProductoListViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.cargarProductos(forceSilent = true)
+    }
+
     ProductoListContent(
         state = state,
-        onRetry = { viewModel.cargarProductos() },
+        onRetry = { viewModel.cargarProductos(forceSilent = false) },
         onAgregarClick = { navController.navigate("producto/nuevo") },
         onProductoClick = { id -> navController.navigate("producto/$id/editar") },
         onNuevaVentaClick = { navController.navigate("venta/nueva") },

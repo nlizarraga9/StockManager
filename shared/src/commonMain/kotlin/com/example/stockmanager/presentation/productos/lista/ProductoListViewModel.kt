@@ -29,13 +29,11 @@ class ProductoListViewModel(
     private val _state = MutableStateFlow<ProductoListState>(ProductoListState.Loading)
     val state: StateFlow<ProductoListState> = _state.asStateFlow()
 
-    init {
-        cargarProductos()
-    }
-
-    fun cargarProductos() {
+    fun cargarProductos(forceSilent: Boolean = false) {
         viewModelScope.launch {
-            _state.value = ProductoListState.Loading
+            if (!forceSilent || _state.value !is ProductoListState.Success) {
+                _state.value = ProductoListState.Loading
+            }
             try {
                 val productos = getProductos()
                 _state.value =
