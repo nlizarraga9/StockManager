@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +33,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import stockmanager.shared.generated.resources.Res
 import stockmanager.shared.generated.resources.add
+import stockmanager.shared.generated.resources.shopping_cart
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -42,8 +44,9 @@ fun ProductoListScreen(navController: NavController) {
     ProductoListContent(
         state = state,
         onRetry = { viewModel.cargarProductos() },
-        onAgregarClick = {},
-        onProductoClick = {},
+        onAgregarClick = { navController.navigate("producto/nuevo") },
+        onProductoClick = { id -> navController.navigate("producto/$id/editar") },
+        onNuevaVentaClick = { navController.navigate("venta/nueva") },
     )
 }
 
@@ -54,6 +57,7 @@ fun ProductoListContent(
     onRetry: () -> Unit,
     onAgregarClick: () -> Unit,
     onProductoClick: (String) -> Unit,
+    onNuevaVentaClick: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -62,11 +66,26 @@ fun ProductoListContent(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* TODO: navegar a formulario */ }) {
-                Icon(
-                    painter = painterResource(Res.drawable.add),
-                    contentDescription = "Agregar producto",
+            Column(horizontalAlignment = Alignment.End) {
+                ExtendedFloatingActionButton(
+                    onClick = onNuevaVentaClick,
+                    icon = {
+                        Icon(
+                            painter = painterResource(Res.drawable.shopping_cart),
+                            contentDescription = null,
+                        )
+                    },
+                    text = { Text("Nueva venta") },
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
+                Spacer(Modifier.height(12.dp))
+                FloatingActionButton(onClick = onAgregarClick) {
+                    Icon(
+                        painter = painterResource(Res.drawable.add),
+                        contentDescription = "Agregar producto",
+                    )
+                }
             }
         },
     ) { padding ->
@@ -125,12 +144,16 @@ fun ProductoListContent(
                 is ProductoListState.Success -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(vertical = 8.dp),
+                        contentPadding =
+                            PaddingValues(
+                                top = 8.dp,
+                                bottom = 140.dp,
+                            ),
                     ) {
                         items(s.productos, key = { it.id }) { producto ->
                             ProductoCard(
                                 producto = producto,
-                                onClick = { /* TODO: navegar a detalle */ },
+                                onClick = { onProductoClick(producto.id) },
                             )
                         }
                     }
