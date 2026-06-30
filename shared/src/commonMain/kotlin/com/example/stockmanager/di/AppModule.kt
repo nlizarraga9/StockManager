@@ -8,7 +8,7 @@ import com.example.stockmanager.domain.usecase.producto.GetProductosUseCase
 import com.example.stockmanager.domain.usecase.venta.CrearVentaUseCase
 import com.example.stockmanager.presentation.productos.form.ProductoFormViewModel
 import com.example.stockmanager.presentation.productos.lista.ProductoListViewModel
-import com.example.stockmanager.presentation.venta.VentaViewModel
+import com.example.stockmanager.presentation.venta.nueva.VentaViewModel
 import org.koin.dsl.module
 
 val appModule =

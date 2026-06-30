@@ -1,4 +1,4 @@
-package com.example.stockmanager.presentation.venta
+package com.example.stockmanager.presentation.venta.nueva
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -548,7 +548,6 @@ fun VentaLoadingPreview() {
         VentaContent(state = VentaState.LoadingProductos)
     }
 }
-
 
 @Preview(showBackground = true, showSystemUi = true)
 @Suppress("ktlint:standard:function-naming")

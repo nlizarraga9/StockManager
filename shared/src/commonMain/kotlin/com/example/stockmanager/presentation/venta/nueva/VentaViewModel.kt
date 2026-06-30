@@ -1,9 +1,8 @@
-package com.example.stockmanager.presentation.venta
+package com.example.stockmanager.presentation.venta.nueva
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stockmanager.domain.model.Producto
-import com.example.stockmanager.domain.model.Venta
 import com.example.stockmanager.domain.model.VentaItem
 import com.example.stockmanager.domain.usecase.producto.GetProductosUseCase
 import com.example.stockmanager.domain.usecase.venta.CrearVentaUseCase

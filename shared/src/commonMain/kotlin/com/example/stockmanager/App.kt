@@ -10,7 +10,7 @@ import androidx.navigation.navArgument
 import com.example.stockmanager.di.appModule
 import com.example.stockmanager.presentation.productos.form.ProductoFormScreen
 import com.example.stockmanager.presentation.productos.lista.ProductoListScreen
-import com.example.stockmanager.presentation.venta.VentaScreen
+import com.example.stockmanager.presentation.venta.nueva.VentaScreen
 import org.koin.compose.KoinApplication
 
 @Suppress("ktlint:standard:function-naming")
