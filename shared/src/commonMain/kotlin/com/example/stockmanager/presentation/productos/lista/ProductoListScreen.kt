@@ -51,7 +51,7 @@ fun ProductoListScreen(navController: NavController) {
         state = state,
         onRetry = { viewModel.cargarProductos(forceSilent = false) },
         onAgregarClick = { navController.navigate("producto/nuevo") },
-        onProductoClick = { id -> navController.navigate("producto/$id/editar") },
+        onProductoClick = { id -> navController.navigate("producto/$id/detalle") },
         onNuevaVentaClick = { navController.navigate("venta/nueva") },
     )
 }
