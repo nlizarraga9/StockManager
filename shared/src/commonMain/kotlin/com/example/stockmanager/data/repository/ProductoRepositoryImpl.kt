@@ -28,7 +28,7 @@ class ProductoRepositoryImpl : ProductoRepository {
     override suspend fun insertProducto(producto: Producto) {
         client
             .from("productos")
-            .update(producto.toDto()) { filter { eq("id", producto.id) } }
+            .insert(producto.toDto())
     }
 
     override suspend fun updateProducto(producto: Producto) {
