@@ -48,4 +48,31 @@ class VentaRepositoryImpl : VentaRepository {
             ventaDto.toDomain(items = items)
         }
     }
+
+    override suspend fun getVenta(id: String): Venta {
+        val ventaDto =
+            client
+                .from("venta_items")
+                .select { filter { eq("id", id) } }
+                .decodeSingle<VentaDto>()
+
+        val items =
+            client
+                .from("venta_items")
+                .select { filter { eq("venta_id", id) } }
+                .decodeList<VentaItemDto>()
+                .map { it.toDomain() }
+
+        return ventaDto.toDomain(items = items)
+    }
+
+    override suspend fun deleteVenta(id: String) {
+        client
+            .from("venta_items")
+            .delete { filter { eq("vent_id", id) } }
+
+        client
+            .from("ventas")
+            .delete { filter { eq("id", id) } }
+    }
 }

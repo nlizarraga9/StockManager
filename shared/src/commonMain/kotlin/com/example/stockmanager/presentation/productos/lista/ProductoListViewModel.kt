@@ -3,7 +3,7 @@ package com.example.stockmanager.presentation.productos.lista
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stockmanager.domain.model.Producto
-import com.example.stockmanager.domain.usecase.GetProductosUseCase
+import com.example.stockmanager.domain.usecase.producto.GetProductosUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

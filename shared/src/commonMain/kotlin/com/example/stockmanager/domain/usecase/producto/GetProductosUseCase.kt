@@ -1,4 +1,4 @@
-package com.example.stockmanager.domain.usecase
+package com.example.stockmanager.domain.usecase.producto
 
 import com.example.stockmanager.domain.model.Producto
 import com.example.stockmanager.domain.repository.ProductoRepository

@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.stockmanager.domain.model.Producto
 import com.example.stockmanager.domain.model.Venta
 import com.example.stockmanager.domain.model.VentaItem
-import com.example.stockmanager.domain.usecase.CrearVentaUseCase
-import com.example.stockmanager.domain.usecase.GetProductosUseCase
+import com.example.stockmanager.domain.usecase.producto.GetProductosUseCase
+import com.example.stockmanager.domain.usecase.venta.CrearVentaUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

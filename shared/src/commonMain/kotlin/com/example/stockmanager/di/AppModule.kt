@@ -4,8 +4,8 @@ import com.example.stockmanager.data.repository.ProductoRepositoryImpl
 import com.example.stockmanager.data.repository.VentaRepositoryImpl
 import com.example.stockmanager.domain.repository.ProductoRepository
 import com.example.stockmanager.domain.repository.VentaRepository
-import com.example.stockmanager.domain.usecase.CrearVentaUseCase
-import com.example.stockmanager.domain.usecase.GetProductosUseCase
+import com.example.stockmanager.domain.usecase.producto.GetProductosUseCase
+import com.example.stockmanager.domain.usecase.venta.CrearVentaUseCase
 import com.example.stockmanager.presentation.productos.form.ProductoFormViewModel
 import com.example.stockmanager.presentation.productos.lista.ProductoListViewModel
 import com.example.stockmanager.presentation.venta.VentaViewModel

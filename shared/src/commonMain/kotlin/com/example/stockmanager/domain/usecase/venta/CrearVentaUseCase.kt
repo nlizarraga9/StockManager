@@ -1,4 +1,4 @@
-package com.example.stockmanager.domain.usecase
+package com.example.stockmanager.domain.usecase.venta
 
 import com.example.stockmanager.domain.model.Venta
 import com.example.stockmanager.domain.model.VentaItem
@@ -36,7 +36,7 @@ class CrearVentaUseCase(
         val venta =
             Venta(
                 items = items,
-                total = Venta.calcularTotal(items),
+                total = Venta.Companion.calcularTotal(items),
             )
         return ventaRepository.crearVenta(venta)
     }
