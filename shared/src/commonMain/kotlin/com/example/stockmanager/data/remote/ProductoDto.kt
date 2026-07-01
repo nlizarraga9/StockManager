@@ -1,18 +1,23 @@
 package com.example.stockmanager.data.remote
 
 import com.example.stockmanager.domain.model.Producto
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class ProductoDto(
     val id: String = "",
     val nombre: String,
+    @EncodeDefault
     val descripcion: String? = null,
     val precio: Double,
     val stock: Int,
     @SerialName("stock_minimo")
     val stockMinimo: Int = 5,
+    @EncodeDefault
     @SerialName("imagen_url")
     val imagenUrl: String? = null,
     @SerialName("created_at")
