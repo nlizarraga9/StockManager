@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +34,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,6 +59,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import stockmanager.shared.generated.resources.Res
 import stockmanager.shared.generated.resources.add
 import stockmanager.shared.generated.resources.shopping_cart
+import stockmanager.shared.generated.resources.inventory
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -154,6 +158,9 @@ fun ProductoListContent(
         topBar = {
             TopAppBar(
                 title = { Text("Stock Almacén") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         },
         floatingActionButton = {
@@ -169,7 +176,6 @@ fun ProductoListContent(
                 text = { Text("Nuevo producto") },
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.offset(y = 10.dp),
             )
         },
     ) { padding ->
@@ -209,42 +215,21 @@ fun ProductoListContent(
             ) {
                 ProductSortMode.entries.forEach { mode ->
                     val selected = sortMode == mode
-                    val backgroundColor =
-                        if (selected) {
-                            MaterialTheme.colorScheme.primaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant
-                                .copy(
-                                    alpha = 0.5f,
-                                )
-                        }
-                    val contentColor =
-                        if (selected) {
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        }
-
-                    Surface(
-                        onClick = { onSortModeChange(mode) },
+                    FilterChip(
                         selected = selected,
-                        shape = RoundedCornerShape(16.dp),
-                        color = backgroundColor,
-                        contentColor = contentColor,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Box(
-                            modifier = Modifier.padding(vertical = 6.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
+                        onClick = { onSortModeChange(mode) },
+                        label = {
                             Text(
                                 text = mode.displayName,
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
                                 textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth(),
                             )
-                        }
-                    }
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f),
+                    )
                 }
             }
 
@@ -286,6 +271,13 @@ fun ProductoListContent(
                             modifier = Modifier.align(Alignment.Center).padding(32.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
+                            Icon(
+                                painter = painterResource(Res.drawable.inventory),
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                            )
+                            Spacer(Modifier.height(16.dp))
                             Text(
                                 text = "No hay productos",
                                 style = MaterialTheme.typography.titleMedium,

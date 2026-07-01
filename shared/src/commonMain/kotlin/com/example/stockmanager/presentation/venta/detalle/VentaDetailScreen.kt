@@ -26,7 +26,9 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -137,6 +139,9 @@ fun VentaDetailContent(
                         )
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         },
     ) { padding ->
@@ -202,6 +207,7 @@ fun VentaDetailContent(
                         OutlinedButton(
                             onClick = { mostrarConfirmacionEliminar = true },
                             modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
                         ) {
                             Icon(
@@ -232,6 +238,7 @@ fun VentaDetailContent(
                                     mostrarConfirmacionEliminar = false
                                     onEliminar()
                                 },
+                                shape = RoundedCornerShape(12.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                             ) { Text("Eliminar") }
                         },

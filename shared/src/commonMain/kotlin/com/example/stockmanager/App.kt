@@ -2,12 +2,15 @@ package com.example.stockmanager
 
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Snackbar
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,12 +48,24 @@ fun App() {
                         MainBottomBar(navController = navController)
                     }
                 },
-                snackbarHost = { SnackbarHost(snackbarHostState) }
+                snackbarHost = {
+                    SnackbarHost(snackbarHostState) { data ->
+                        Snackbar(
+                            snackbarData = data,
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            actionColor = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(12.dp),
+                        )
+                    }
+                }
             ) { padding ->
                 NavHost(
                     navController = navController,
                     startDestination = "productos",
-                    modifier = Modifier.fillMaxSize().padding(padding),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = padding.calculateBottomPadding()),
                 ) {
                     // Listado de productos
                     composable("productos") {

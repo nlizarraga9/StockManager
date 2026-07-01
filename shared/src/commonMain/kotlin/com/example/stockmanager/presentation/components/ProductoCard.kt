@@ -52,23 +52,17 @@ fun ProductoCard(
         CardDefaults.cardColors(
             containerColor =
                 when {
-                    producto.sinStock -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.25f)
-                    producto.stockBajo -> Color(0xFFFF9800).copy(alpha = 0.08f)
+                    producto.sinStock -> Color(0xFFFCE8E6) // Opaque soft red (prevents shadow bleed)
+                    producto.stockBajo -> Color(0xFFFFF3E0) // Opaque soft orange (prevents shadow bleed)
                     else -> CardDefaults.cardColors().containerColor
                 },
         )
 
-    val borderStroke =
-        when {
-            producto.sinStock -> BorderStroke(1.5.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f))
-            producto.stockBajo -> BorderStroke(1.5.dp, Color(0xFFFF9800).copy(alpha = 0.5f))
-            else -> null
-        }
-
     Card(
         onClick = onClick,
         colors = cardColors,
-        border = borderStroke,
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier =
             Modifier
                 .fillMaxWidth()
@@ -84,7 +78,7 @@ fun ProductoCard(
                 modifier =
                     Modifier
                         .size(64.dp)
-                        .clip(RoundedCornerShape(8.dp)),
+                        .clip(RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center,
             ) {
                 if (imageBitmap != null) {
@@ -131,7 +125,7 @@ fun ProductoCard(
             Column(horizontalAlignment = Alignment.End) {
                 Surface(
                     color = stockColor.copy(alpha = 0.15f),
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(12.dp),
                 ) {
                     Text(
                         text = "Stock: ${producto.stock}",

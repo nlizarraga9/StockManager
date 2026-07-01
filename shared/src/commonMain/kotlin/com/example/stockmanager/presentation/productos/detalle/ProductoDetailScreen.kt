@@ -28,6 +28,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -151,6 +153,9 @@ fun ProductoDetailContent(
                         )
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         },
     ) { padding ->
@@ -199,6 +204,7 @@ fun ProductoDetailContent(
                                 .fillMaxWidth()
                                 .height(200.dp),
                         shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -241,7 +247,11 @@ fun ProductoDetailContent(
 
                     Spacer(Modifier.height(20.dp))
 
-                    Card(modifier = Modifier.fillMaxWidth()) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             DetailRow(label = "Precio", value = producto.precio.toPrice())
                             Spacer(Modifier.height(12.dp))
@@ -253,7 +263,7 @@ fun ProductoDetailContent(
                                 Text("Stock actual", style = MaterialTheme.typography.bodyMedium)
                                 Surface(
                                     color = stockColor.copy(alpha = 0.15f),
-                                    shape = RoundedCornerShape(8.dp),
+                                    shape = RoundedCornerShape(12.dp),
                                 ) {
                                     Text(
                                         text = "${producto.stock} unidades",
@@ -284,6 +294,7 @@ fun ProductoDetailContent(
                     Button(
                         onClick = onEditar,
                         modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
                     ) {
                         Text("Editar producto")
                     }
@@ -291,6 +302,7 @@ fun ProductoDetailContent(
                     OutlinedButton(
                         onClick = { mostrarConfirmacionEliminar = true },
                         modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
                         colors =
                             ButtonDefaults.outlinedButtonColors(
                                 contentColor = MaterialTheme.colorScheme.error,

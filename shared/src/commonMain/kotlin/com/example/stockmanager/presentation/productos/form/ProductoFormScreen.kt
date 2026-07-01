@@ -29,7 +29,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.addOutline
+import androidx.compose.ui.unit.Dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,6 +54,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -186,6 +200,9 @@ fun ProductoFormContent(
                         )
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         },
     ) { padding ->
@@ -226,12 +243,23 @@ fun ProductoFormContent(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .height(180.dp),
+                            .height(180.dp)
+                            .then(
+                                if (imagenUrl == null) {
+                                    Modifier.dashedBorder(
+                                        width = 1.5.dp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                        shape = RoundedCornerShape(12.dp),
+                                    )
+                                } else {
+                                    Modifier
+                                }
+                            ),
                     shape = RoundedCornerShape(12.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
                     ) {
                         val bitmap = imagenUrl?.decodeBase64ToBitmap()
                         if (bitmap != null) {
@@ -243,46 +271,74 @@ fun ProductoFormContent(
                             )
                         } else {
                             // Mostrar default de sin imagen
-                            Image(
-                                painter = painterResource(Res.drawable.sin_imagen),
-                                contentDescription = "Sin imagen",
-                                modifier = Modifier.size(80.dp),
-                                contentScale = ContentScale.Fit,
-                                alpha = 0.5f,
-                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable(enabled = !isSaving) { imagePicker.pickImage() },
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                            ) {
+                                Image(
+                                    painter = painterResource(Res.drawable.sin_imagen),
+                                    contentDescription = "Sin imagen",
+                                    modifier = Modifier.size(60.dp),
+                                    contentScale = ContentScale.Fit,
+                                    alpha = 0.5f,
+                                )
+                                Spacer(Modifier.height(8.dp))
+                                Text(
+                                    text = "Tocá para agregar imagen",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                )
+                            }
                         }
-                    }
-                }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    OutlinedButton(
-                        onClick = { imagePicker.pickImage() },
-                        modifier = Modifier.weight(1f),
-                        enabled = !isSaving,
-                    ) {
-                        Text("Galería")
-                    }
-                    OutlinedButton(
-                        onClick = { imagePicker.takePhoto() },
-                        modifier = Modifier.weight(1f),
-                        enabled = !isSaving,
-                    ) {
-                        Text("Cámara")
-                    }
-                    if (imagenUrl != null) {
-                        OutlinedButton(
-                            onClick = { onImagenChange(null) },
-                            modifier = Modifier.weight(1f),
-                            colors =
-                                ButtonDefaults.outlinedButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.error,
-                                ),
-                            enabled = !isSaving,
+                        // Overlay píldora con opciones de imagen
+                        Surface(
+                            shape = RoundedCornerShape(20.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.9f),
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(12.dp),
                         ) {
-                            Text("Quitar")
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = "Galería",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.clickable(enabled = !isSaving) { imagePicker.pickImage() },
+                                )
+                                Text(
+                                    text = "|",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                                )
+                                Text(
+                                    text = "Cámara",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.clickable(enabled = !isSaving) { imagePicker.takePhoto() },
+                                )
+                                if (imagenUrl != null) {
+                                    Text(
+                                        text = "|",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                                    )
+                                    Text(
+                                        text = "Quitar",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.error,
+                                        modifier = Modifier.clickable(enabled = !isSaving) { onImagenChange(null) },
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -295,6 +351,7 @@ fun ProductoFormContent(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     enabled = !isSaving,
+                    shape = RoundedCornerShape(12.dp),
                 )
 
                 OutlinedTextField(
@@ -304,6 +361,7 @@ fun ProductoFormContent(
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 3,
                     enabled = !isSaving,
+                    shape = RoundedCornerShape(12.dp),
                 )
 
                 OutlinedTextField(
@@ -315,6 +373,7 @@ fun ProductoFormContent(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     prefix = { Text("$ ") },
                     enabled = !isSaving,
+                    shape = RoundedCornerShape(12.dp),
                 )
 
                 OutlinedTextField(
@@ -325,6 +384,7 @@ fun ProductoFormContent(
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     enabled = !isSaving,
+                    shape = RoundedCornerShape(12.dp),
                 )
 
                 OutlinedTextField(
@@ -336,6 +396,7 @@ fun ProductoFormContent(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     supportingText = { Text("Alerta de stock bajo cuando el stock llega a este valor") },
                     enabled = !isSaving,
+                    shape = RoundedCornerShape(12.dp),
                 )
 
                 Spacer(Modifier.height(8.dp))
@@ -344,6 +405,7 @@ fun ProductoFormContent(
                     onClick = onGuardar,
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !isSaving,
+                    shape = RoundedCornerShape(12.dp),
                 ) {
                     if (isSaving) {
                         CircularProgressIndicator(
@@ -481,4 +543,17 @@ fun ProductoFormLoadingPreview() {
             onBack = {},
         )
     }
+}
+
+fun Modifier.dashedBorder(width: Dp, color: Color, shape: Shape): Modifier = this.drawWithContent {
+    drawContent()
+    val stroke = Stroke(
+        width = width.toPx(),
+        pathEffect = PathEffect.dashPathEffect(floatArrayOf(15f, 10f), 0f),
+    )
+    val outline = shape.createOutline(size, layoutDirection, this)
+    val path = Path().apply {
+        addOutline(outline)
+    }
+    drawPath(path = path, color = color, style = stroke)
 }
