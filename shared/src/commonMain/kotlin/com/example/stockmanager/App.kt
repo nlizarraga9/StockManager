@@ -1,5 +1,8 @@
 package com.example.stockmanager
 
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -33,22 +36,28 @@ fun App() {
             val backStackEntry by navController.currentBackStackEntryAsState()
             val rutaActual = backStackEntry?.destination?.route
             val mostrarBottomBar = rutaActual in rutasConBottomBar
+            val snackbarHostState = remember { SnackbarHostState() }
 
             Scaffold(
+                modifier = Modifier.fillMaxSize(),
                 bottomBar = {
                     if (mostrarBottomBar) {
                         MainBottomBar(navController = navController)
                     }
                 },
+                snackbarHost = { SnackbarHost(snackbarHostState) }
             ) { padding ->
                 NavHost(
                     navController = navController,
                     startDestination = "productos",
-                    modifier = Modifier.padding(padding),
+                    modifier = Modifier.fillMaxSize().padding(padding),
                 ) {
                     // Listado de productos
                     composable("productos") {
-                        ProductoListScreen(navController = navController)
+                        ProductoListScreen(
+                            navController = navController,
+                            snackbarHostState = snackbarHostState
+                        )
                     }
 
                     // Detalle de producto
@@ -57,7 +66,11 @@ fun App() {
                         arguments = listOf(navArgument("id") { type = NavType.StringType }),
                     ) { backStack ->
                         val id = backStack.arguments?.getString("id").orEmpty()
-                        ProductoDetailScreen(navController = navController, productoId = id)
+                        ProductoDetailScreen(
+                            navController = navController,
+                            productoId = id,
+                            snackbarHostState = snackbarHostState
+                        )
                     }
 
                     // Nuevo producto
@@ -65,6 +78,7 @@ fun App() {
                         ProductoFormScreen(
                             navController = navController,
                             productoId = null,
+                            snackbarHostState = snackbarHostState
                         )
                     }
 
@@ -77,12 +91,16 @@ fun App() {
                         ProductoFormScreen(
                             navController = navController,
                             productoId = id,
+                            snackbarHostState = snackbarHostState
                         )
                     }
 
                     // Listado de ventas
                     composable("ventas") {
-                        VentaListScreen(navController = navController)
+                        VentaListScreen(
+                            navController = navController,
+                            snackbarHostState = snackbarHostState
+                        )
                     }
 
                     // Detalle de venta
@@ -91,12 +109,19 @@ fun App() {
                         arguments = listOf(navArgument("id") { type = NavType.StringType }),
                     ) { backStack ->
                         val id = backStack.arguments?.getString("id").orEmpty()
-                        VentaDetailScreen(navController = navController, ventaId = id)
+                        VentaDetailScreen(
+                            navController = navController,
+                            ventaId = id,
+                            snackbarHostState = snackbarHostState
+                        )
                     }
 
                     // Nueva venta
                     composable("venta/nueva") {
-                        VentaScreen(navController = navController)
+                        VentaScreen(
+                            navController = navController,
+                            snackbarHostState = snackbarHostState
+                        )
                     }
                 }
             }

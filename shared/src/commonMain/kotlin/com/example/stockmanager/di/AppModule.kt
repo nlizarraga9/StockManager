@@ -29,10 +29,10 @@ val appModule =
         factory { EliminarVentaUseCase(ventaRepository = get(), productoRepository = get()) }
 
         // ViewModels
-        factory { ProductoListViewModel(get()) }
+        factory { ProductoListViewModel(getProductos = get(), repository = get()) }
         factory { ProductoFormViewModel(get()) }
         factory { ProductoDetailViewModel(repository = get(), eliminarProducto = get()) }
         factory { VentaViewModel(getProductos = get(), crearVenta = get()) }
-        factory { VentaListViewModel(get()) }
+        factory { VentaListViewModel(repository = get(), crearVenta = get()) }
         factory { VentaDetailViewModel(repository = get(), eliminarVenta = get()) }
     }

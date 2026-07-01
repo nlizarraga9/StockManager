@@ -62,12 +62,12 @@ import stockmanager.shared.generated.resources.sin_imagen
 fun ProductoFormScreen(
     navController: NavController,
     productoId: String?,
+    snackbarHostState: SnackbarHostState,
 ) {
     val viewModel = koinViewModel<ProductoFormViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val esEdicion = productoId != null
-    val snackbarHostState = remember { SnackbarHostState() }
 
     // Campos
     var nombre by rememberSaveable { mutableStateOf("") }
@@ -100,6 +100,10 @@ fun ProductoFormScreen(
             }
 
             is ProductoFormState.SaveSuccess -> {
+                navController.previousBackStackEntry?.savedStateHandle?.set(
+                    "producto_action_success",
+                    if (esEdicion) "edit" else "add"
+                )
                 navController.popBackStack()
             }
 
@@ -169,6 +173,7 @@ fun ProductoFormContent(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = { Text(if (esEdicion) "Editar producto" else "Nuevo producto") },
@@ -183,7 +188,6 @@ fun ProductoFormContent(
                 },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         if (isLoading) {
             Box(

@@ -65,15 +65,17 @@ import stockmanager.shared.generated.resources.remove
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
-fun VentaScreen(navController: NavController) {
+fun VentaScreen(
+    navController: NavController,
+    snackbarHostState: SnackbarHostState,
+) {
     val viewModel = koinViewModel<VentaViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-
-    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(state) {
         when (val s = state) {
             is VentaState.VentaExitosa -> {
+                navController.previousBackStackEntry?.savedStateHandle?.set("venta_action_success", "add")
                 navController.popBackStack()
             }
 
@@ -90,7 +92,6 @@ fun VentaScreen(navController: NavController) {
 
     VentaContent(
         state = state,
-        snackbarHostState = snackbarHostState,
         onAgregarAlCarrito = { producto, cantidad -> viewModel.agregarAlCarrito(producto, cantidad) },
         onIncrementar = { id, cantidad -> viewModel.cambiarCantidad(id, cantidad + 1) },
         onDecrementar = { id, cantidad -> viewModel.cambiarCantidad(id, cantidad - 1) },
@@ -105,7 +106,6 @@ fun VentaScreen(navController: NavController) {
 @Composable
 fun VentaContent(
     state: VentaState,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onAgregarAlCarrito: (Producto, Int) -> Unit = { _, _ -> },
     onIncrementar: (String, Int) -> Unit = { _, _ -> },
     onDecrementar: (String, Int) -> Unit = { _, _ -> },
@@ -119,6 +119,7 @@ fun VentaContent(
     var mostrarConfirmacion by remember { mutableStateOf(false) }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = { Text("Nueva venta") },
@@ -133,7 +134,6 @@ fun VentaContent(
                 },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         when (val s = state) {
             is VentaState.LoadingProductos -> {

@@ -44,9 +44,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.stockmanager.data.remote.ProductoDto
+import com.example.stockmanager.data.remote.toDto
 import com.example.stockmanager.domain.model.Producto
 import com.example.stockmanager.utils.decodeBase64ToBitmap
 import com.example.stockmanager.utils.toPrice
+import kotlinx.serialization.json.Json.Default.encodeToString
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import stockmanager.shared.generated.resources.Res
@@ -60,18 +63,47 @@ import stockmanager.shared.generated.resources.sin_imagen
 fun ProductoDetailScreen(
     navController: NavController,
     productoId: String,
+    snackbarHostState: SnackbarHostState,
 ) {
     val viewModel = koinViewModel<ProductoDetailViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
+    var lastProductBeforeDelete by remember { mutableStateOf<Producto?>(null) }
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
 
     LaunchedEffect(productoId) {
         viewModel.cargarProducto(productoId)
     }
 
+    LaunchedEffect(savedStateHandle) {
+        savedStateHandle?.getStateFlow<String?>("producto_action_success", null)
+            ?.collect { action ->
+                if (action == "edit") {
+                    savedStateHandle.remove<String>("producto_action_success")
+                    snackbarHostState.showSnackbar("Producto editado con éxito")
+                    viewModel.cargarProducto(productoId)
+                }
+            }
+    }
+
     LaunchedEffect(state) {
         when (val s = state) {
+            is ProductoDetailState.Loaded -> {
+                lastProductBeforeDelete = s.producto
+            }
+
             is ProductoDetailState.Deleted -> {
+                lastProductBeforeDelete?.let { prod ->
+                    try {
+                        val json =
+                            encodeToString(
+                                ProductoDto.serializer(),
+                                prod.toDto(),
+                            )
+                        navController.previousBackStackEntry?.savedStateHandle?.set("deleted_product", json)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
                 navController.popBackStack()
             }
 
@@ -89,7 +121,6 @@ fun ProductoDetailScreen(
 
     ProductoDetailContent(
         state = state,
-        snackbarHostState = snackbarHostState,
         onEditar = { navController.navigate("producto/$productoId/editar") },
         onEliminar = { viewModel.eliminar(productoId) },
         onBack = { navController.popBackStack() },
@@ -100,7 +131,6 @@ fun ProductoDetailScreen(
 @Composable
 fun ProductoDetailContent(
     state: ProductoDetailState,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onEditar: () -> Unit = {},
     onEliminar: () -> Unit = {},
     onBack: () -> Unit = {},
@@ -108,6 +138,7 @@ fun ProductoDetailContent(
     var mostrarConfirmacionEliminar by remember { mutableStateOf(false) }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = { Text("Detalle del producto") },
@@ -122,7 +153,6 @@ fun ProductoDetailContent(
                 },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         when (state) {
             is ProductoDetailState.Loading -> {

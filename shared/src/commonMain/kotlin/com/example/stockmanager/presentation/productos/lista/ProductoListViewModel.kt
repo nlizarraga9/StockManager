@@ -3,6 +3,7 @@ package com.example.stockmanager.presentation.productos.lista
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stockmanager.domain.model.Producto
+import com.example.stockmanager.domain.repository.ProductoRepository
 import com.example.stockmanager.domain.usecase.producto.GetProductosUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,6 +32,7 @@ sealed class ProductoListState {
 
 class ProductoListViewModel(
     private val getProductos: GetProductosUseCase,
+    private val repository: ProductoRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow<ProductoListState>(ProductoListState.Loading)
     val state: StateFlow<ProductoListState> = _state.asStateFlow()
@@ -101,5 +103,18 @@ class ProductoListViewModel(
             }
         }
         _state.value = ProductoListState.Success(sorted)
+    }
+
+    fun deshacerEliminar(producto: Producto) {
+        viewModelScope.launch {
+            try {
+                repository.insertProducto(producto)
+                cargarProductos(forceSilent = true)
+            } catch (e: Exception) {
+                _state.value = ProductoListState.Error(
+                    e.message ?: "Error al restaurar producto"
+                )
+            }
+        }
     }
 }

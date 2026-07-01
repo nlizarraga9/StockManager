@@ -40,10 +40,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.stockmanager.data.remote.VentaItemDto
+import com.example.stockmanager.data.remote.toDto
 import com.example.stockmanager.domain.model.Venta
 import com.example.stockmanager.domain.model.VentaItem
 import com.example.stockmanager.utils.toFechaLegible
 import com.example.stockmanager.utils.toPrice
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json.Default.encodeToString
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import stockmanager.shared.generated.resources.Res
@@ -55,10 +59,11 @@ import stockmanager.shared.generated.resources.delete
 fun VentaDetailScreen(
     navController: NavController,
     ventaId: String,
+    snackbarHostState: SnackbarHostState,
 ) {
     val viewModel = koinViewModel<VentaDetailViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
+    var lastVentaBeforeDelete by remember { mutableStateOf<Venta?>(null) }
 
     LaunchedEffect(ventaId) {
         viewModel.cargarVenta(ventaId)
@@ -66,7 +71,27 @@ fun VentaDetailScreen(
 
     LaunchedEffect(state) {
         when (val s = state) {
+            is VentaDetailState.Loaded -> {
+                lastVentaBeforeDelete = s.venta
+            }
+
             is VentaDetailState.Deleted -> {
+                lastVentaBeforeDelete?.let { v ->
+                    try {
+                        val listSerializer =
+                            ListSerializer(
+                                VentaItemDto.serializer(),
+                            )
+                        val json =
+                            encodeToString(
+                                listSerializer,
+                                v.items.map { it.toDto(ventaIdOverride = "") },
+                            )
+                        navController.previousBackStackEntry?.savedStateHandle?.set("deleted_venta_items", json)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
                 navController.popBackStack()
             }
 
@@ -84,7 +109,6 @@ fun VentaDetailScreen(
 
     VentaDetailContent(
         state = state,
-        snackbarHostState = snackbarHostState,
         onEliminar = { viewModel.eliminar(ventaId) },
         onBack = { navController.popBackStack() },
     )
@@ -94,13 +118,13 @@ fun VentaDetailScreen(
 @Composable
 fun VentaDetailContent(
     state: VentaDetailState,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onEliminar: () -> Unit = {},
     onBack: () -> Unit = {},
 ) {
     var mostrarConfirmacionEliminar by remember { mutableStateOf(false) }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = { Text("Detalle de venta") },
@@ -115,7 +139,6 @@ fun VentaDetailContent(
                 },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         when (state) {
             is VentaDetailState.Loading -> {
@@ -198,9 +221,9 @@ fun VentaDetailContent(
                         text = {
                             Text(
                                 "¿Seguro que querés eliminar esta venta? El stock de los " +
-                                        "${venta.items.size} " +
-                                        (if (venta.items.size == 1) "producto involucrado" else "productos involucrados") +
-                                        " se va a devolver automáticamente.",
+                                    "${venta.items.size} " +
+                                    (if (venta.items.size == 1) "producto involucrado" else "productos involucrados") +
+                                    " se va a devolver automáticamente.",
                             )
                         },
                         confirmButton = {
@@ -221,7 +244,9 @@ fun VentaDetailContent(
                 }
             }
 
-            is VentaDetailState.Error, is VentaDetailState.Deleted -> Unit
+            is VentaDetailState.Error, is VentaDetailState.Deleted -> {
+                Unit
+            }
         }
     }
 }
@@ -267,13 +292,13 @@ private val ventaEjemplo =
                     productoId = "1",
                     nombreProducto = "Coca Cola 2.25L",
                     cantidad = 2,
-                    precioUnitario = 1500.0
+                    precioUnitario = 1500.0,
                 ),
                 VentaItem(
                     productoId = "2",
                     nombreProducto = "Arroz Gallo 1kg",
                     cantidad = 1,
-                    precioUnitario = 900.0
+                    precioUnitario = 900.0,
                 ),
             ),
     )
