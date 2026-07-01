@@ -52,6 +52,7 @@ class ProductoFormViewModel(
         precio: String,
         stock: String,
         stockMinimo: String,
+        imagenUrl: String?,
     ) {
         val precioDouble = precio.replace(",", ".").toDoubleOrNull()
         val stockInt = stock.toIntOrNull()
@@ -81,6 +82,7 @@ class ProductoFormViewModel(
                         precio = precioDouble,
                         stock = stockInt,
                         stockMinimo = stockMinimoInt,
+                        imagenUrl = imagenUrl,
                     )
                 if (id == null) {
                     repository.insertProducto(producto)

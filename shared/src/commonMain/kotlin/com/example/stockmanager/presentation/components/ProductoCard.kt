@@ -1,28 +1,39 @@
 package com.example.stockmanager.presentation.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.stockmanager.domain.model.Producto
+import com.example.stockmanager.utils.decodeBase64ToBitmap
 import com.example.stockmanager.utils.toPrice
+import org.jetbrains.compose.resources.painterResource
 import stockmanager.shared.generated.resources.Res
+import stockmanager.shared.generated.resources.inventory
+import stockmanager.shared.generated.resources.sin_imagen
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -37,19 +48,22 @@ fun ProductoCard(
             else -> MaterialTheme.colorScheme.primary
         }
 
-    val cardColors = CardDefaults.cardColors(
-        containerColor = when {
-            producto.sinStock -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.25f)
-            producto.stockBajo -> Color(0xFFFF9800).copy(alpha = 0.08f)
-            else -> CardDefaults.cardColors().containerColor
-        }
-    )
+    val cardColors =
+        CardDefaults.cardColors(
+            containerColor =
+                when {
+                    producto.sinStock -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.25f)
+                    producto.stockBajo -> Color(0xFFFF9800).copy(alpha = 0.08f)
+                    else -> CardDefaults.cardColors().containerColor
+                },
+        )
 
-    val borderStroke = when {
-        producto.sinStock -> BorderStroke(1.5.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f))
-        producto.stockBajo -> BorderStroke(1.5.dp, Color(0xFFFF9800).copy(alpha = 0.5f))
-        else -> null
-    }
+    val borderStroke =
+        when {
+            producto.sinStock -> BorderStroke(1.5.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f))
+            producto.stockBajo -> BorderStroke(1.5.dp, Color(0xFFFF9800).copy(alpha = 0.5f))
+            else -> null
+        }
 
     Card(
         onClick = onClick,
@@ -64,6 +78,35 @@ fun ProductoCard(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            // Imagen
+            val imageBitmap = producto.imagenUrl?.decodeBase64ToBitmap()
+            Box(
+                modifier =
+                    Modifier
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (imageBitmap != null) {
+                    Image(
+                        bitmap = imageBitmap,
+                        contentDescription = producto.nombre,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(Res.drawable.sin_imagen),
+                        contentDescription = "Sin imagen",
+                        modifier = Modifier.size(36.dp),
+                        contentScale = ContentScale.Fit,
+                        alpha = 0.5f,
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = producto.nombre,
@@ -121,8 +164,7 @@ fun ProductoCard(
     }
 }
 
-
-//---  Previews --------------------------------
+// ---  Previews --------------------------------
 
 private val productoNormal =
     Producto(

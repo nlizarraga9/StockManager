@@ -1,5 +1,6 @@
 package com.example.stockmanager.presentation.productos.detalle
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,19 +36,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.stockmanager.domain.model.Producto
+import com.example.stockmanager.utils.decodeBase64ToBitmap
 import com.example.stockmanager.utils.toPrice
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import stockmanager.shared.generated.resources.Res
 import stockmanager.shared.generated.resources.arrow_back
 import stockmanager.shared.generated.resources.delete
+import stockmanager.shared.generated.resources.inventory
+import stockmanager.shared.generated.resources.sin_imagen
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -155,6 +161,40 @@ fun ProductoDetailContent(
                             .padding(padding)
                             .padding(16.dp),
                 ) {
+                    // Imagen del producto
+                    val imageBitmap = producto.imagenUrl?.decodeBase64ToBitmap()
+                    Card(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            if (imageBitmap != null) {
+                                Image(
+                                    bitmap = imageBitmap,
+                                    contentDescription = producto.nombre,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                )
+                            } else {
+                                Image(
+                                    painter = painterResource(Res.drawable.sin_imagen),
+                                    contentDescription = "Sin imagen",
+                                    modifier = Modifier.size(90.dp),
+                                    contentScale = ContentScale.Fit,
+                                    alpha = 0.5f,
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
                     Text(
                         text = producto.nombre,
                         style = MaterialTheme.typography.headlineSmall,

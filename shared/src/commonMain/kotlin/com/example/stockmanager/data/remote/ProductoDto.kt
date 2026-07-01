@@ -13,6 +13,8 @@ data class ProductoDto(
     val stock: Int,
     @SerialName("stock_minimo")
     val stockMinimo: Int = 5,
+    @SerialName("imagen_url")
+    val imagenUrl: String? = null,
     @SerialName("created_at")
     val createdAt: String? = null,
     @SerialName("updated_at")
@@ -27,6 +29,7 @@ fun ProductoDto.toDomain(): Producto =
         precio = precio,
         stock = stock,
         stockMinimo = stockMinimo,
+        imagenUrl = imagenUrl,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
@@ -39,4 +42,5 @@ fun Producto.toDto(): ProductoDto =
         precio = precio,
         stock = stock,
         stockMinimo = stockMinimo,
+        imagenUrl = imagenUrl,
     )

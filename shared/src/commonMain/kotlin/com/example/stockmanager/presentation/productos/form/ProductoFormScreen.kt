@@ -1,8 +1,10 @@
 package com.example.stockmanager.presentation.productos.form
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,13 +13,17 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -33,16 +39,23 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.stockmanager.domain.model.Producto
+import com.example.stockmanager.utils.Base64Factory
+import com.example.stockmanager.utils.decodeBase64ToBitmap
+import com.example.stockmanager.utils.rememberImagePicker
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import stockmanager.shared.generated.resources.Res
 import stockmanager.shared.generated.resources.arrow_back
+import stockmanager.shared.generated.resources.inventory
+import stockmanager.shared.generated.resources.sin_imagen
 
 @Suppress("ktlint:standard:function-naming")
 @Composable
@@ -62,12 +75,13 @@ fun ProductoFormScreen(
     var precio by rememberSaveable { mutableStateOf("") }
     var stock by rememberSaveable { mutableStateOf("") }
     var stockMinimo by rememberSaveable { mutableStateOf("5") }
+    var imagenUrl by rememberSaveable { mutableStateOf<String?>(null) }
     var camposCargados by rememberSaveable { mutableStateOf(false) }
 
     // Cargar datos is es edicion
     LaunchedEffect(productoId) {
-        if (esEdicion && !camposCargados) {
-            viewModel.cargarProducto(productoId!!)
+        if (productoId != null && !camposCargados) {
+            viewModel.cargarProducto(productoId)
         }
     }
 
@@ -80,6 +94,7 @@ fun ProductoFormScreen(
                     precio = s.producto.precio.toString()
                     stock = s.producto.stock.toString()
                     stockMinimo = s.producto.stockMinimo.toString()
+                    imagenUrl = s.producto.imagenUrl
                     camposCargados = true
                 }
             }
@@ -108,11 +123,13 @@ fun ProductoFormScreen(
         precio = precio,
         stock = stock,
         stockMinimo = stockMinimo,
+        imagenUrl = imagenUrl,
         onNombreChange = { nombre = it },
         onDescripcionChange = { descripcion = it },
         onPrecioChange = { precio = it },
         onStockChange = { stock = it },
         onStockMinimoChange = { stockMinimo = it },
+        onImagenChange = { imagenUrl = it },
         onGuardar = {
             viewModel.guardarProducto(
                 id = productoId,
@@ -121,6 +138,7 @@ fun ProductoFormScreen(
                 precio = precio,
                 stock = stock,
                 stockMinimo = stockMinimo,
+                imagenUrl = imagenUrl,
             )
         },
         onBack = { navController.popBackStack() },
@@ -139,11 +157,13 @@ fun ProductoFormContent(
     precio: String,
     stock: String,
     stockMinimo: String,
+    imagenUrl: String?,
     onNombreChange: (String) -> Unit,
     onDescripcionChange: (String) -> Unit,
     onPrecioChange: (String) -> Unit,
     onStockChange: (String) -> Unit,
     onStockMinimoChange: (String) -> Unit,
+    onImagenChange: (String?) -> Unit,
     onGuardar: () -> Unit,
     onBack: () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
@@ -183,6 +203,85 @@ fun ProductoFormContent(
                         .imePadding(),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                Spacer(Modifier.height(4.dp))
+
+                // Sección de imagen
+                Text(
+                    text = "Foto del Producto (opcional)",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                val imagePicker =
+                    rememberImagePicker { bytes ->
+                        val base64 = "data:image/jpeg;base64," + Base64Factory.encode(bytes)
+                        onImagenChange(base64)
+                    }
+
+                Card(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(180.dp),
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        val bitmap = imagenUrl?.decodeBase64ToBitmap()
+                        if (bitmap != null) {
+                            Image(
+                                bitmap = bitmap,
+                                contentDescription = "Imagen del producto",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                            )
+                        } else {
+                            // Mostrar default de sin imagen
+                            Image(
+                                painter = painterResource(Res.drawable.sin_imagen),
+                                contentDescription = "Sin imagen",
+                                modifier = Modifier.size(80.dp),
+                                contentScale = ContentScale.Fit,
+                                alpha = 0.5f,
+                            )
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    OutlinedButton(
+                        onClick = { imagePicker.pickImage() },
+                        modifier = Modifier.weight(1f),
+                        enabled = !isSaving,
+                    ) {
+                        Text("Galería")
+                    }
+                    OutlinedButton(
+                        onClick = { imagePicker.takePhoto() },
+                        modifier = Modifier.weight(1f),
+                        enabled = !isSaving,
+                    ) {
+                        Text("Cámara")
+                    }
+                    if (imagenUrl != null) {
+                        OutlinedButton(
+                            onClick = { onImagenChange(null) },
+                            modifier = Modifier.weight(1f),
+                            colors =
+                                ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.error,
+                                ),
+                            enabled = !isSaving,
+                        ) {
+                            Text("Quitar")
+                        }
+                    }
+                }
                 Spacer(Modifier.height(4.dp))
 
                 OutlinedTextField(
@@ -261,14 +360,16 @@ fun ProductoFormContent(
 
 // ---- PREVIEWS ----
 
-private val productoEjemplo = Producto(
-    id = "1",
-    nombre = "Coca Cola 2.25L",
-    descripcion = "Gaseosa cola",
-    precio = 1500.0,
-    stock = 24,
-    stockMinimo = 5,
-)
+private val productoEjemplo =
+    Producto(
+        id = "1",
+        nombre = "Coca Cola 2.25L",
+        descripcion = "Gaseosa cola",
+        precio = 1500.0,
+        stock = 24,
+        stockMinimo = 5,
+        imagenUrl = null,
+    )
 
 @Preview(showBackground = true, showSystemUi = true)
 @Suppress("ktlint:standard:function-naming")
@@ -284,11 +385,13 @@ fun ProductoFormNuevoPreview() {
             precio = "",
             stock = "",
             stockMinimo = "5",
+            imagenUrl = null,
             onNombreChange = {},
             onDescripcionChange = {},
             onPrecioChange = {},
             onStockChange = {},
             onStockMinimoChange = {},
+            onImagenChange = {},
             onGuardar = {},
             onBack = {},
         )
@@ -309,11 +412,13 @@ fun ProductoFormEditarPreview() {
             precio = productoEjemplo.precio.toString(),
             stock = productoEjemplo.stock.toString(),
             stockMinimo = productoEjemplo.stockMinimo.toString(),
+            imagenUrl = null,
             onNombreChange = {},
             onDescripcionChange = {},
             onPrecioChange = {},
             onStockChange = {},
             onStockMinimoChange = {},
+            onImagenChange = {},
             onGuardar = {},
             onBack = {},
         )
@@ -334,11 +439,13 @@ fun ProductoFormGuardandoPreview() {
             precio = productoEjemplo.precio.toString(),
             stock = productoEjemplo.stock.toString(),
             stockMinimo = productoEjemplo.stockMinimo.toString(),
+            imagenUrl = null,
             onNombreChange = {},
             onDescripcionChange = {},
             onPrecioChange = {},
             onStockChange = {},
             onStockMinimoChange = {},
+            onImagenChange = {},
             onGuardar = {},
             onBack = {},
         )
@@ -359,11 +466,13 @@ fun ProductoFormLoadingPreview() {
             precio = "",
             stock = "",
             stockMinimo = "5",
+            imagenUrl = null,
             onNombreChange = {},
             onDescripcionChange = {},
             onPrecioChange = {},
             onStockChange = {},
             onStockMinimoChange = {},
+            onImagenChange = {},
             onGuardar = {},
             onBack = {},
         )
