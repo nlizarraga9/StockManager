@@ -52,7 +52,7 @@ class VentaRepositoryImpl : VentaRepository {
     override suspend fun getVenta(id: String): Venta {
         val ventaDto =
             client
-                .from("venta_items")
+                .from("ventas")
                 .select { filter { eq("id", id) } }
                 .decodeSingle<VentaDto>()
 
@@ -69,7 +69,7 @@ class VentaRepositoryImpl : VentaRepository {
     override suspend fun deleteVenta(id: String) {
         client
             .from("venta_items")
-            .delete { filter { eq("vent_id", id) } }
+            .delete { filter { eq("venta_id", id) } }
 
         client
             .from("ventas")

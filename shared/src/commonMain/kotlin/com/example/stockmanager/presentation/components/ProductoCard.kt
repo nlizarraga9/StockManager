@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -35,8 +37,24 @@ fun ProductoCard(
             else -> MaterialTheme.colorScheme.primary
         }
 
+    val cardColors = CardDefaults.cardColors(
+        containerColor = when {
+            producto.sinStock -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.25f)
+            producto.stockBajo -> Color(0xFFFF9800).copy(alpha = 0.08f)
+            else -> CardDefaults.cardColors().containerColor
+        }
+    )
+
+    val borderStroke = when {
+        producto.sinStock -> BorderStroke(1.5.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f))
+        producto.stockBajo -> BorderStroke(1.5.dp, Color(0xFFFF9800).copy(alpha = 0.5f))
+        else -> null
+    }
+
     Card(
         onClick = onClick,
+        colors = cardColors,
+        border = borderStroke,
         modifier =
             Modifier
                 .fillMaxWidth()

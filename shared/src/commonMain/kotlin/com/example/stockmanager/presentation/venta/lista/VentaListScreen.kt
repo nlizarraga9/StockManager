@@ -26,6 +26,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import org.jetbrains.compose.resources.painterResource
+import stockmanager.shared.generated.resources.Res
+import stockmanager.shared.generated.resources.shopping_cart
+import stockmanager.shared.generated.resources.add
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.stockmanager.domain.model.Venta
@@ -40,10 +50,15 @@ fun VentaListScreen(navController: NavController) {
     val viewModel = koinViewModel<VentaListViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.cargarVentas()
+    }
+
     VentaListContent(
         state = state,
         onRetry = { viewModel.cargarVentas() },
         onVentaClick = { id -> navController.navigate("venta/$id/detalle") },
+        onNuevaVentaClick = { navController.navigate("venta/nueva") },
     )
 }
 
@@ -53,14 +68,31 @@ fun VentaListContent(
     state: VentaListState,
     onRetry: () -> Unit = {},
     onVentaClick: (String) -> Unit = {},
+    onNuevaVentaClick: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Historial de ventas") })
         },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = onNuevaVentaClick,
+                icon = {
+                    Icon(
+                        painter = painterResource(Res.drawable.add),
+                        contentDescription = null,
+                        modifier = Modifier.size(26.dp),
+                    )
+                },
+                text = { Text("Nueva venta") },
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.offset(y = 10.dp),
+            )
+        },
     ) { padding ->
         Box(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding()),
         ) {
             when (val s = state) {
                 is VentaListState.Loading -> {
@@ -104,7 +136,7 @@ fun VentaListContent(
                 is VentaListState.Success -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp),
+                        contentPadding = PaddingValues(top = 8.dp, bottom = 80.dp),
                     ) {
                         items(s.ventas, key = { it.id }) { venta ->
                             VentaCard(venta = venta, onClick = { onVentaClick(venta.id) })

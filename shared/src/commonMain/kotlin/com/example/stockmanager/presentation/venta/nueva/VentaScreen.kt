@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -126,6 +127,7 @@ fun VentaContent(
                         Icon(
                             painter = painterResource(Res.drawable.arrow_back),
                             contentDescription = "Volver",
+                            modifier = Modifier.size(28.dp),
                         )
                     }
                 },
@@ -242,6 +244,7 @@ fun VentaContent(
                                     Icon(
                                         painter = painterResource(Res.drawable.add),
                                         contentDescription = null,
+                                        modifier = Modifier.size(26.dp),
                                     )
                                     Spacer(Modifier.width(4.dp))
                                     Text("Agregar")
@@ -359,12 +362,14 @@ private fun CarritoItemRow(
                         painter = painterResource(Res.drawable.delete),
                         contentDescription = "Eliminar",
                         tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(26.dp),
                     )
                 }
                 IconButton(onClick = onDecrementar) {
                     Icon(
                         painter = painterResource(Res.drawable.remove),
                         contentDescription = "Decrementar",
+                        modifier = Modifier.size(26.dp),
                     )
                 }
                 Text(
@@ -378,6 +383,7 @@ private fun CarritoItemRow(
                     Icon(
                         painter = painterResource(Res.drawable.add),
                         contentDescription = "Incrementar",
+                        modifier = Modifier.size(26.dp),
                     )
                 }
             }
@@ -409,7 +415,9 @@ internal fun SelectorProductoSheet(
         HorizontalDivider()
 
         if (productoSeleccionado == null) {
-            val disponibles = productos.filter { it.stock > 0 }
+            val disponibles = productos
+                .filter { it.stock > 0 }
+                .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.nombre })
             LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
                 if (disponibles.isEmpty()) {
                     item {
@@ -496,6 +504,7 @@ internal fun SelectorProductoSheet(
                         Icon(
                             painter = painterResource(Res.drawable.remove),
                             contentDescription = "Menos",
+                            modifier = Modifier.size(26.dp),
                         )
                     }
                     Text(cantidad.toString(), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
@@ -503,6 +512,7 @@ internal fun SelectorProductoSheet(
                         Icon(
                             painter = painterResource(Res.drawable.add),
                             contentDescription = "Más",
+                            modifier = Modifier.size(26.dp),
                         )
                     }
                 }

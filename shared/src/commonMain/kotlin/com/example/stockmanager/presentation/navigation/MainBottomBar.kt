@@ -15,6 +15,10 @@ import stockmanager.shared.generated.resources.Res
 import stockmanager.shared.generated.resources.inventory
 import stockmanager.shared.generated.resources.shopping_cart
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
 sealed class BottomDestination(
     val route: String,
     val label: String,
@@ -68,6 +72,7 @@ fun MainBottomBar(navController: NavController) {
                                 },
                             ),
                         contentDescription = destination.label,
+                        modifier = Modifier.size(28.dp),
                     )
                 },
                 label = { Text(destination.label) },

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -109,6 +110,7 @@ fun ProductoDetailContent(
                         Icon(
                             painter = painterResource(Res.drawable.arrow_back),
                             contentDescription = "Volver",
+                            modifier = Modifier.size(28.dp),
                         )
                     }
                 },
@@ -227,7 +229,7 @@ fun ProductoDetailContent(
                         Icon(
                             painter = painterResource(Res.drawable.delete),
                             contentDescription = null,
-                            modifier = Modifier.padding(end = 4.dp),
+                            modifier = Modifier.size(26.dp).padding(end = 4.dp),
                         )
                         Text("Eliminar producto")
                     }

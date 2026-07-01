@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -156,6 +157,7 @@ fun ProductoFormContent(
                         Icon(
                             painter = painterResource(Res.drawable.arrow_back),
                             contentDescription = "Volver",
+                            modifier = Modifier.size(28.dp),
                         )
                     }
                 },
